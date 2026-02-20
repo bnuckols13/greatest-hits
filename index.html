@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>The Compendium — Expressive Arts Library</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --ink: #0F0D0A;
+      --midnight: #0D1117;
+      --deep: #111827;
+      --parchment: #F5EED8;
+      --cream: #FAF6EC;
+      --amber: #C8860A;
+      --gold: #D4A017;
+      --gold-light: #E8C547;
+      --silver: #9BAAB8;
+      --muted: #6B7A8D;
+      --text: #E8E0D0;
+
+      /* Cluster colors */
+      --teal: #4ECDC4;
+      --rose: #F4A0A0;
+      --purple: #A78BFA;
+      --sage: #7DC4A0;
+      --coral: #F4967A;
+      --blue: #7EB8F0;
+      --gold-c: #E8C547;
+      --silver-c: #B8C8D4;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      background: var(--midnight);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── Atmosphere ── */
+    .atm {
+      position: fixed; inset: 0;
+      pointer-events: none; z-index: 0; overflow: hidden;
+    }
+    .atm-grad {
+      position: absolute; inset: 0;
+      background:
+        radial-gradient(ellipse 70% 50% at 15% 10%, rgba(30,58,95,0.5) 0%, transparent 55%),
+        radial-gradient(ellipse 50% 70% at 90% 95%, rgba(14,24,18,0.5) 0%, transparent 55%),
+        var(--midnight);
+    }
+    .atm-orb {
+      position: absolute; border-radius: 50%;
+      filter: blur(90px); opacity: 0.1;
+      animation: breathe 22s infinite ease-in-out;
+    }
+    .atm-orb:nth-child(2) { width:500px;height:500px;background:#1E3A5F;top:-150px;left:-100px; }
+    .atm-orb:nth-child(3) { width:350px;height:350px;background:#C8860A;bottom:5%;right:-80px;animation-delay:-8s;opacity:0.06; }
+    .atm-orb:nth-child(4) { width:280px;height:280px;background:#2A5F3F;top:40%;left:55%;animation-delay:-15s; }
+    @keyframes breathe {
+      0%,100%{transform:scale(1) translate(0,0);}
+      33%{transform:scale(1.12) translate(25px,-20px);}
+      66%{transform:scale(0.9) translate(-15px,18px);}
+    }
+
+    /* ── Layout ── */
+    .wrap { max-width: 1100px; margin: 0 auto; padding: 2rem 1.5rem 5rem; position: relative; z-index: 1; }
+
+    /* ── Header ── */
+    .masthead {
+      text-align: center;
+      padding: 3.5rem 0 2rem;
+      animation: rise 1s ease both;
+    }
+    .eyebrow {
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem; letter-spacing: 0.35em;
+      color: var(--amber); text-transform: uppercase;
+      margin-bottom: 1rem;
+    }
+    .masthead h1 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 700; color: var(--parchment);
+      letter-spacing: 0.05em; line-height: 1.1;
+      margin-bottom: 0.4rem;
+    }
+    .masthead h1 em {
+      font-family: 'IM Fell English', serif;
+      font-style: italic; color: var(--gold-light);
+    }
+    .rule { display:flex;align-items:center;gap:1rem;justify-content:center;margin:1rem 0; }
+    .rule span { height:1px;width:70px;background:linear-gradient(90deg,transparent,var(--amber),transparent); }
+    .rule .r { color:var(--amber);font-size:0.9rem;opacity:0.7; }
+    .masthead p {
+      font-family: 'IM Fell English', serif;
+      font-style: italic; font-size: 1.05rem;
+      color: var(--silver); max-width: 480px; margin: 0 auto;
+    }
+
+    @keyframes rise { from{opacity:0;transform:translateY(20px);}to{opacity:1;transform:translateY(0);} }
+
+    /* ── Search / Filter ── */
+    .filter-bar {
+      display: flex; gap: 0.6rem; flex-wrap: wrap;
+      justify-content: center; margin: 2rem 0 1.5rem;
+    }
+    .filter-btn {
+      font-family: 'Cinzel', serif;
+      font-size: 0.6rem; letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 0.45rem 1.1rem; border-radius: 20px;
+      border: 1px solid rgba(184,196,204,0.2);
+      background: transparent; color: var(--silver);
+      cursor: pointer; transition: all 0.25s ease;
+    }
+    .filter-btn:hover { border-color: var(--amber); color: var(--gold-light); }
+    .filter-btn.on { border-color: var(--amber); background: rgba(200,134,10,0.15); color: var(--gold-light); }
+
+    /* ── Library Grid ── */
+    .library {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 1.2rem;
+      margin-top: 1rem;
+    }
+
+    .group-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(184,196,204,0.1);
+      border-radius: 14px; padding: 1.5rem;
+      cursor: pointer; transition: all 0.3s ease;
+      position: relative; overflow: hidden;
+      animation: rise 0.6s ease both;
+    }
+    .group-card::before {
+      content:''; position:absolute;
+      top:0;left:0;right:0;height:3px;
+      opacity:0.7; transition: opacity 0.3s ease;
+    }
+    .group-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 35px rgba(0,0,0,0.35);
+      border-color: rgba(200,134,10,0.3);
+      background: rgba(255,255,255,0.05);
+    }
+    .group-card:hover::before { opacity: 1; }
+    .group-card.hidden { display: none; }
+
+    /* cluster color accents */
+    .c-teal::before  { background: linear-gradient(90deg, var(--teal), transparent); }
+    .c-rose::before  { background: linear-gradient(90deg, var(--rose), transparent); }
+    .c-purple::before{ background: linear-gradient(90deg, var(--purple), transparent); }
+    .c-sage::before  { background: linear-gradient(90deg, var(--sage), transparent); }
+    .c-coral::before { background: linear-gradient(90deg, var(--coral), transparent); }
+    .c-blue::before  { background: linear-gradient(90deg, var(--blue), transparent); }
+    .c-gold::before  { background: linear-gradient(90deg, var(--gold-c), transparent); }
+    .c-silver::before{ background: linear-gradient(90deg, var(--silver-c), transparent); }
+
+    .card-num {
+      font-family: 'Cinzel', serif;
+      font-size: 0.58rem; letter-spacing: 0.2em;
+      margin-bottom: 0.4rem; opacity: 0.6;
+    }
+    .card-title {
+      font-family: 'Cinzel', serif;
+      font-size: 1rem; color: var(--parchment);
+      margin-bottom: 0.2rem;
+    }
+    .card-tagline {
+      font-family: 'IM Fell English', serif;
+      font-style: italic; font-size: 0.9rem;
+      color: var(--silver); margin-bottom: 0.9rem;
+    }
+    .card-tags { display:flex; flex-wrap:wrap; gap:0.4rem; }
+    .tag {
+      font-family: 'Cinzel', serif;
+      font-size: 0.55rem; letter-spacing: 0.1em;
+      padding: 0.25rem 0.6rem; border-radius: 10px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.08);
+      color: var(--muted); white-space: nowrap;
+    }
+
+    /* ── Detail Panel ── */
+    #detail {
+      display: none;
+      animation: rise 0.5s ease;
+    }
+    #detail.open { display: block; }
+
+    .back-btn {
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem; letter-spacing: 0.15em; text-transform: uppercase;
+      padding: 0.55rem 1.4rem; border-radius: 20px;
+      border: 1px solid rgba(200,134,10,0.3);
+      background: transparent; color: var(--amber);
+      cursor: pointer; transition: all 0.25s ease;
+      margin-bottom: 2rem; display: inline-flex; align-items: center; gap: 0.5rem;
+    }
+    .back-btn:hover { background: rgba(200,134,10,0.1); }
+
+    .detail-header {
+      margin-bottom: 2rem;
+    }
+    .detail-header h2 {
+      font-family: 'Cinzel', serif;
+      font-size: clamp(1.8rem, 4vw, 2.8rem);
+      color: var(--parchment); font-weight: 600; margin-bottom: 0.3rem;
+    }
+    .detail-header h2 em {
+      font-family: 'IM Fell English', serif;
+      font-style: italic; color: var(--gold-light);
+    }
+    .detail-header .sub {
+      font-family: 'IM Fell English', serif;
+      font-style: italic; font-size: 1.1rem; color: var(--silver);
+    }
+
+    /* Quote */
+    .quote-block {
+      background: rgba(200,134,10,0.06);
+      border-left: 3px solid var(--amber);
+      border-radius: 0 12px 12px 0;
+      padding: 1.4rem 2rem; margin: 1.5rem 0;
+    }
+    .quote-block blockquote {
+      font-family: 'IM Fell English', serif;
+      font-style: italic; font-size: 1.15rem; line-height: 1.75;
+      color: var(--parchment); margin-bottom: 0.6rem;
+    }
+    .quote-block cite {
+      font-family: 'Cinzel', serif;
+      font-size: 0.65rem; letter-spacing: 0.15em; color: var(--amber);
+    }
+
+    /* Frame card */
+    .frame-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(184,196,204,0.1);
+      border-radius: 14px; padding: 1.8rem 2rem;
+      margin-bottom: 1.5rem;
+    }
+    .frame-card h3 {
+      font-family: 'Cinzel', serif;
+      font-size: 0.8rem; letter-spacing: 0.15em;
+      color: var(--amber); text-transform: uppercase;
+      margin-bottom: 0.8rem;
+    }
+    .frame-card p {
+      font-size: 1.05rem; line-height: 1.85;
+      color: var(--text); margin-bottom: 0.8rem;
+    }
+    .frame-card p:last-child { margin-bottom: 0; }
+    .modality-chips { display:flex;flex-wrap:wrap;gap:0.5rem;margin-top:1rem; }
+    .chip {
+      font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;
+      padding:0.35rem 0.9rem;border-radius:14px;
+      background:rgba(200,134,10,0.1);border:1px solid rgba(200,134,10,0.2);
+      color:var(--amber);
+    }
+
+    /* Station section */
+    .stations-label {
+      font-family:'Cinzel',serif;font-size:0.7rem;letter-spacing:0.25em;
+      text-transform:uppercase;color:var(--amber);
+      margin:2rem 0 1rem;
+    }
+    .station-grid {
+      display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:1rem;
+    }
+    .stn {
+      background:rgba(255,255,255,0.03);
+      border:1px solid rgba(184,196,204,0.1);
+      border-radius:12px;padding:1.3rem;
+      cursor:pointer;transition:all 0.25s ease;
+    }
+    .stn:hover { border-color:rgba(200,134,10,0.35);background:rgba(200,134,10,0.04); }
+    .stn.open { border-color:var(--amber);background:rgba(200,134,10,0.07); }
+    .stn-top { display:flex;justify-content:space-between;align-items:flex-start; }
+    .stn-name {
+      font-family:'Cinzel',serif;font-size:0.9rem;
+      color:var(--parchment);margin-bottom:0.15rem;
+    }
+    .stn-sub {
+      font-family:'IM Fell English',serif;font-style:italic;
+      font-size:0.88rem;color:var(--silver);
+    }
+    .stn-arrow { color:var(--amber);font-size:0.75rem;transition:transform 0.25s ease;margin-top:0.2rem; }
+    .stn.open .stn-arrow { transform:rotate(180deg); }
+    .stn-prompts {
+      display:none;border-top:1px solid rgba(200,134,10,0.15);
+      padding-top:1rem;margin-top:0.8rem;
+    }
+    .stn.open .stn-prompts { display:block;animation:rise 0.35s ease; }
+    .stn-prompts ol { padding-left:1.2rem; }
+    .stn-prompts li {
+      font-size:0.93rem;line-height:1.8;
+      color:var(--text);margin-bottom:0.5rem;
+    }
+    .stn-prompts li em { color:var(--silver); }
+    .pass-note {
+      margin-top:0.9rem;padding:0.55rem 0.9rem;
+      background:rgba(78,205,196,0.07);border-radius:8px;
+      border:1px solid rgba(78,205,196,0.15);
+      font-family:'Cinzel',serif;font-size:0.62rem;
+      letter-spacing:0.05em;color:var(--teal);
+    }
+
+    /* Reflection */
+    .reflect-section { margin-top:2.5rem; }
+    .reflect-grid { display:grid;grid-template-columns:1fr 1fr;gap:1rem;margin-top:1rem; }
+    @media(max-width:600px){.reflect-grid{grid-template-columns:1fr;}}
+    .rf label {
+      font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.15em;
+      color:var(--amber);text-transform:uppercase;display:block;margin-bottom:0.4rem;
+    }
+    .rf textarea {
+      width:100%;min-height:90px;
+      background:rgba(255,255,255,0.04);
+      border:1px solid rgba(184,196,204,0.2);border-radius:10px;
+      padding:0.9rem;color:var(--parchment);
+      font-family:'Cormorant Garamond',Georgia,serif;font-size:1rem;line-height:1.6;
+      resize:vertical;transition:border-color 0.25s ease;
+    }
+    .rf textarea:focus { outline:none;border-color:var(--amber);box-shadow:0 0 0 3px rgba(200,134,10,0.1); }
+    .rf textarea::placeholder { color:rgba(184,196,204,0.3); }
+    .rf-full { grid-column:1/-1; }
+
+    .btn {
+      font-family:'Cinzel',serif;font-size:0.65rem;letter-spacing:0.15em;text-transform:uppercase;
+      padding:0.65rem 1.8rem;border-radius:20px;
+      border:1px solid var(--amber);background:rgba(200,134,10,0.12);
+      color:var(--gold-light);cursor:pointer;transition:all 0.25s ease;
+      margin-top:1rem;margin-right:0.6rem;
+    }
+    .btn:hover { background:rgba(200,134,10,0.25);box-shadow:0 4px 18px rgba(200,134,10,0.2); }
+    .btn-ghost { background:transparent;border-color:rgba(184,196,204,0.25);color:var(--silver); }
+    .btn-ghost:hover { border-color:var(--silver);background:rgba(255,255,255,0.05); }
+    #sv-note {
+      font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;
+      color:var(--teal);display:none;margin-top:0.5rem;
+    }
+
+    /* Crisis */
+    .crisis {
+      background:rgba(255,255,255,0.03);border:1px solid rgba(78,205,196,0.15);
+      border-radius:10px;padding:1rem 1.5rem;margin-top:2rem;
+      display:flex;flex-wrap:wrap;gap:0.5rem 2rem;align-items:center;
+    }
+    .crisis span { font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--teal); }
+    .crisis a { font-size:0.85rem;color:var(--silver);text-decoration:none; }
+    .crisis a:hover { color:var(--parchment); }
+
+    /* Responsive */
+    @media(max-width:600px){
+      .wrap{padding:1rem 1rem 4rem;}
+      .library{grid-template-columns:1fr;}
+      .station-grid{grid-template-columns:1fr;}
+      .masthead{padding:2rem 0 1.5rem;}
+    }
+    @media(prefers-reduced-motion:reduce){
+      *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;}
+    }
+  </style>
+</head>
+<body>
+<div class="atm">
+  <div class="atm-grad"></div>
+  <div class="atm-orb"></div>
+  <div class="atm-orb"></div>
+  <div class="atm-orb"></div>
+</div>
+
+<div class="wrap">
+
+  <!-- ── Masthead ── -->
+  <div class="masthead" id="masthead">
+    <p class="eyebrow">Brian Nuckols · CFD Expressive Arts Program</p>
+    <h1>The <em>Compendium</em></h1>
+    <div class="rule"><span></span><span class="r">᛭</span><span></span></div>
+    <p>Nineteen pathways into the body's wisdom — a complete library of expressive arts groups</p>
+  </div>
+
+  <!-- ── Filter Bar ── -->
+  <div class="filter-bar" id="filterBar">
+    <button class="filter-btn on" onclick="filter('all',this)">All 19</button>
+    <button class="filter-btn" onclick="filter('nervous',this)">Nervous System</button>
+    <button class="filter-btn" onclick="filter('self',this)">Self &amp; Identity</button>
+    <button class="filter-btn" onclick="filter('relation',this)">Relationships</button>
+    <button class="filter-btn" onclick="filter('dialectic',this)">Dialectics</button>
+    <button class="filter-btn" onclick="filter('meaning',this)">Meaning &amp; Growth</button>
+    <button class="filter-btn" onclick="filter('emotion',this)">Emotion</button>
+  </div>
+
+  <!-- ── Library Grid ── -->
+  <div class="library" id="library"></div>
+
+  <!-- ── Detail View ── -->
+  <div id="detail"></div>
+
+</div><!-- /wrap -->
+
+<script>
+// ═══════════════════════════════════════════════════════════
+// DATA — All 19 Groups
+// ═══════════════════════════════════════════════════════════
+const GROUPS = [
+  {
+    id:'glimmers', num:'01', cluster:'nervous', color:'c-teal',
+    title:'Glimmers',
+    tagline:'Small moments of safety and joy',
+    tags:['Polyvagal Theory','Ventral Vagal','Joy','Regulation'],
+    quote:{text:'The opposite of a trigger is a glimmer — a micro-moment of safety and connection that cues the nervous system toward regulation.',attr:'Deb Dana'},
+    frame:`Glimmers are the small, often fleeting moments when our nervous system shifts into a ventral vagal state — the physiological home of safety, connection, and joy. Developed by Deb Dana from Stephen Porges' Polyvagal Theory, glimmers are not necessarily grand experiences of happiness. They are micro-moments: a shaft of light through a window, a dog's nose on your hand, a song that suddenly makes the world feel possible again.\n\nIn recovery and healing, training our attention toward glimmers is not toxic positivity — it is nervous system literacy. We are literally rewiring the brain's tendency toward threat detection by building a practice of noticing safety.`,
+    modalities:['Polyvagal Theory','Deb Dana','Nervous System Regulation','Somatic Awareness'],
+    stations:[
+      {name:'Visual Arts', sub:'Constellations of Joy', prompts:['Create a glimmer map — a visual constellation of all the small moments of safety and joy you can name. Use color, shape, symbol.',`Paint or draw what a glimmer feels like in your body — not what causes it, but the inner landscape of that moment.`,'Make a "glimmer collection jar" — small drawings of each glimmer you noticed today or this week, folded and placed inside.']},
+      {name:'Movement', sub:'Dancing Light', prompts:['Move like sunlight breaking through clouds — let your body find the quality of a glimmer in motion.','Alternate between contracted (triggered) and expanded (glimmering). Let the body trace both states.','Create a small, repeatable movement ritual you can use to welcome a glimmer when you notice one.']},
+      {name:'Music & Sound', sub:'Soundscapes of Safety', prompts:['Hum or create sounds that represent your nervous system in a ventral vagal state — what does safety sound like?','Curate your personal "glimmer playlist" — songs that reliably shift your state toward safety and joy.','Create a rhythm that matches your heartbeat when you feel peaceful. Then find what instruments or sounds support that rhythm.']},
+      {name:'Writing', sub:'Glimmer Verses', prompts:['Write a love letter to one specific glimmer — the smallest moment of goodness you can name right now.','List 13 glimmers from this week. No moment is too small. A warm cup, a green light, a stranger\'s smile.','Write a poem to your nervous system thanking it for every time it found its way back to safety.']},
+      {name:'Drama', sub:'Embodied Narratives', prompts:['Act out the arrival of a glimmer — the moment just before you notice it, and the moment of recognition.','Create a short scene: two people share a glimmer together. What does co-regulation look like in real life?','Perform "before and after" — show your body and face in a triggered state, then receiving a glimmer.']},
+      {name:'Fashion', sub:'Wearing Light', prompts:['Design or create an adornment that represents your most reliable glimmer. Something you could wear as a reminder.','Create a piece that you could touch throughout the day as a sensory glimmer — texture, temperature, weight.','Make a small wearable symbol for the concept of ventral vagal safety: what does "I am safe" look like worn on the body?']},
+      {name:'Open Intuitive', sub:'Follow the Light', prompts:['No instructions. Let your body, your hands, your voice find its own glimmer in this moment. Trust what arises.']}
+    ],
+    reflection:['What glimmer arose in the making today?','Where did you feel it in your body?','What was your nervous system doing as you worked?','One glimmer you want to cultivate this week…']
+  },
+
+  {
+    id:'zest', num:'02', cluster:'self', color:'c-purple',
+    title:'Zest',
+    tagline:'Creative aliveness and character strengths',
+    tags:['VIA Strengths','Character','Aliveness','Vitality'],
+    quote:{text:'Zest is the capacity to live life with excitement and energy, approaching life as an adventure. It is the exact opposite of going through the motions.',attr:'Martin Seligman, VIA Character Strengths'},
+    frame:`Zest — one of the 24 VIA Character Strengths — is the quality of approaching life with excitement, energy, and a sense of aliveness. It is not the same as happiness or productivity. Zest is about being present, engaged, and genuinely awake to experience.\n\nMany people in recovery or healing notice that zest was one of the first things stolen — by trauma, by illness, by the demands of survival. Today we explore what zest looks and feels like in the body, and we practice inviting it back through creative expression.`,
+    modalities:['VIA Character Strengths','Positive Psychology','Somatic Experiencing','Creative Expression'],
+    stations:[
+      {name:'Visual Arts', sub:'Portraits of Aliveness', prompts:['Paint or draw what zest looks like in your body when it\'s fully alive. What color is it? What shape?','Create a "zest timeline" — where in your life did you feel most alive? Least? Map it visually.','Make a collage of everything that sparks genuine excitement in you — not what should, but what does.']},
+      {name:'Movement', sub:'The Living Body', prompts:['Dance the difference between going through the motions and being fully alive. Let the body show you both.','Find a movement that represents your unique way of being in the world when you are most yourself.','Move in a way that is purely pleasurable — not to accomplish anything, not to express anything. Just for the delight of moving.']},
+      {name:'Music & Sound', sub:'Zest Soundscapes', prompts:['Create sounds that represent your creative aliveness. What does YOUR zest sound like?','What songs make you feel most alive? Play them. Let yourself be changed by them.','Improvise — make up a song about what it\'s like to want your life back.']},
+      {name:'Writing', sub:'Letters from Aliveness', prompts:['Write a letter from your most zestful self to your current self. What does it want you to know?','Describe the last time you felt completely alive in your body. Use all five senses.','List 10 things that make you feel genuinely, specifically alive — not happy, not calm, but alive.']},
+      {name:'Drama', sub:'Embodying Vitality', prompts:['Embody someone — real or imagined — who approaches life with full zest. What do they look like? How do they move?','Perform the moment zest returns after a long absence. Make it specific. Make it physical.','Create a scene: two characters have a conversation about what it means to actually want to be here.']},
+      {name:'Fashion', sub:'Wearing Your Aliveness', prompts:['Design an outfit for the most zestful version of yourself. What do they wear? How do they enter a room?','Create an adornment that reminds you of your aliveness — something to touch when you feel yourself going through the motions.','Make something that represents the unique character strength that is yours alone.']},
+      {name:'Open Intuitive', sub:'Pure Aliveness', prompts:['Make something purely because you want to. No therapeutic goal. No outcome. Just creative joy for its own sake.']}
+    ],
+    reflection:['Where did zest show up today — even briefly?','What in your life is currently draining your aliveness?','What one small thing could restore a little more vitality this week?','What would it mean to approach one area of your life with zest?']
+  },
+
+  {
+    id:'self-compassion', num:'03', cluster:'self', color:'c-purple',
+    title:'Self-Compassion vs Self-Criticism',
+    tagline:'The inner dialogue that shapes everything',
+    tags:['Kristin Neff','Inner Critic','IFS','Self-Kindness'],
+    quote:{text:'If you had a friend who spoke to you in the same way that you sometimes speak to yourself, how long would you allow that person to be your friend?',attr:'Kristin Neff'},
+    frame:`Self-compassion, as defined by researcher Kristin Neff, has three components: self-kindness (treating yourself as you would treat a dear friend), common humanity (recognizing that suffering and imperfection are universal human experiences), and mindfulness (holding your painful thoughts and feelings in balanced awareness).\n\nSelf-criticism, by contrast, is often mistaken for motivation or high standards. But research consistently shows it is associated with anxiety, depression, and perfectionism — and undermines the very growth it claims to support. Today we get curious about the inner critic with compassion rather than war — because fighting a part of ourselves only makes it louder.`,
+    modalities:['Kristin Neff','IFS Parts Work','Mindful Self-Compassion','Buddhist Psychology'],
+    stations:[
+      {name:'Visual Arts', sub:'Portraits of the Inner World', prompts:['Draw or paint the inner critic — not to shame it, but to see it. What does it look like? How old is it?','Create a portrait of yourself receiving compassion. What does that moment look like?','Make a visual representation of the gap between how you speak to others and how you speak to yourself.']},
+      {name:'Movement', sub:'Embodied Kindness', prompts:['Place one hand on your heart. Let that gesture become a movement — explore what it means to literally hold yourself.','Move as the inner critic. Then move as the compassionate witness. Notice what each feels like in the body.','Find the movement that says "you are allowed to be here, exactly as you are."']},
+      {name:'Music & Sound', sub:'Two Voices', prompts:['Hum the sound of self-criticism — the tight, contracted, urgent quality of it. Then hum the sound of self-compassion.','Create a lullaby for the part of you that is hurting right now. Sing it without judgment.','What song would your most compassionate self play for you today?']},
+      {name:'Writing', sub:'Letters Between Parts', prompts:['Write a letter from your inner critic. Let it say everything it usually says. Then write back from your compassionate self.','Write the letter you would write to a dear friend who was suffering exactly as you are right now.','Finish this: "What I most need to hear right now is…"']},
+      {name:'Drama', sub:'The Inner Dialogue', prompts:['Perform a conversation between the inner critic and the compassionate witness. Let both have their full say.','Enact the moment the critic quiets — even for a moment. What makes that possible?','Create a scene where someone receives exactly the compassion they need. Let yourself play both roles.']},
+      {name:'Fashion', sub:'Adorning Self-Kindness', prompts:['Make something you could wear as a reminder that you deserve the same kindness you give to others.','Design the "armor" of self-compassion — not to keep things out, but to protect your worthiness.','Create a symbol that represents your common humanity — the reminder that suffering is shared, not shameful.']},
+      {name:'Open Intuitive', sub:'Radical Kindness', prompts:['Create something as an act of self-kindness. Not to be useful. Not to be good. Just for you.']}
+    ],
+    reflection:['What did you notice about the inner critic today?','Where did compassion show up — even briefly?','What does your inner critic most need to hear from your compassionate self?','One small act of self-compassion you could practice this week…']
+  },
+
+  {
+    id:'emotion', num:'04', cluster:'emotion', color:'c-coral',
+    title:'Emotional Exploration',
+    tagline:"Plutchik's wheel and embodied emotion",
+    tags:['Plutchik','Emotion Wheel','Embodiment','Interoception'],
+    quote:{text:'Emotions are not problems to be solved. They are signals to be received.',attr:'Russ Harris, ACT Therapy'},
+    frame:`Robert Plutchik's Wheel of Emotions maps eight primary emotions — joy, trust, fear, surprise, sadness, anticipation, anger, and disgust — and the complex emotions that arise from their combinations. This model helps us develop emotional granularity: the ability to name what we are feeling with precision, which research shows is directly linked to emotional regulation.\n\nBut emotions are not just mental events — they are body events. Interoception, our sense of our own internal state, is how we actually experience emotion. Today we explore emotions not as concepts but as living experiences in the body.`,
+    modalities:['Plutchik','Emotional Granularity','Interoception','Somatic Experiencing'],
+    stations:[
+      {name:'Visual Arts', sub:'Painting Emotion', prompts:['Choose an emotion from Plutchik\'s wheel and create a purely abstract representation of it — no figures, just color, texture, and line.','Map today\'s emotional landscape visually — where did you travel on the wheel today?','Create a portrait of an emotion as a character. Give it a body, a posture, a face.']},
+      {name:'Movement', sub:'The Body Speaks', prompts:['Choose one primary emotion and let it move through your body. How does it want to move? What gesture does it reach for?','Move through several emotions in sequence — notice how your body shifts between them.','Find the movement that lives at the boundary between two emotions. What does "anxious anticipation" feel like in the body?']},
+      {name:'Music & Sound', sub:'Emotional Soundscapes', prompts:['Create a soundscape for one specific emotion using only your voice and breath.','What does anger sound like before it becomes words? Let it be sound first.','Play a piece of music that matches exactly how you feel right now. Then one that is the opposite.']},
+      {name:'Writing', sub:'Emotion as Language', prompts:['Describe one emotion you felt today using only physical sensations — no emotion words allowed.','Write a dialogue between two emotions that are both present right now.','Choose an emotion you tend to avoid and write it a letter of introduction: "Dear Grief, I have been avoiding you because…"']},
+      {name:'Drama', sub:'Embodied Emotion', prompts:['Perform an emotion through posture and gesture alone — no words, no sounds. Let the body carry it all.','Create a scene where two people are experiencing different emotions in response to the same event.','Enact the moment an emotion shifts — what causes the transition?']},
+      {name:'Fashion', sub:'Wearing Your Feelings', prompts:['Design an outfit that matches your emotional state today. What does this emotion want to wear?','Create a wearable symbol for an emotion you want more of in your life.','What would your most complex recent emotion look like as an adornment?']},
+      {name:'Open Intuitive', sub:'Let Emotion Lead', prompts:['Let an emotion guide your creative process. Don\'t think about it — feel it and follow it.']}
+    ],
+    reflection:['Which emotion surprised you today?','Where do you carry emotions in your body most consistently?','Is there an emotion you\'ve been avoiding? What does it need?','What did you learn about your emotional landscape today?']
+  },
+
+  {
+    id:'nvc-eft', num:'05', cluster:'relation', color:'c-rose',
+    title:'NVC & EFT',
+    tagline:'Connection through compassionate communication',
+    tags:['Nonviolent Communication','EFT','Attachment','Rosenberg'],
+    quote:{text:'Every criticism, judgment, diagnosis, and expression of anger is the tragic expression of an unmet need.',attr:'Marshall Rosenberg'},
+    frame:`Nonviolent Communication (Marshall Rosenberg) offers four components for authentic expression: Observation (what happened, without evaluation), Feelings (how I feel about it), Needs (the universal human needs underneath), and Requests (specific, doable asks). Together they create a path from reactivity to genuine contact.\n\nEmotionally Focused Therapy (Sue Johnson) reveals the cycles we get locked into in relationships — pursue/withdraw, attack/collapse — and how to recognize these patterns as protection strategies rather than character flaws. Both frameworks point to the same truth: underneath every conflict is a longing for secure connection.`,
+    modalities:['NVC','EFT','Attachment Theory','Sue Johnson'],
+    stations:[
+      {name:'Visual Arts', sub:'The Space Between', prompts:['Draw the negative cycle — the pursue/withdraw dance — as a visual image. What does it look like from above?','Create two portraits: yourself in reactive mode, then yourself speaking from your deepest need.','Make a map of the attachment longings that live underneath your most challenging relationship patterns.']},
+      {name:'Movement', sub:'The Dance', prompts:['Embody the pursuer — the reaching, the urgency, the need for response. Then embody the withdrawer.','Find the movement of genuine, undefended reaching — what does it look like to ask for connection without armor?','Move through a de-escalation — from activation, through pause, into presence.']},
+      {name:'Music & Sound', sub:'Resonance', prompts:['Create two contrasting soundscapes: the sound of disconnection and the sound of genuine contact.','Hum something that represents the need underneath your most common way of getting stuck in conflict.','Create a "co-regulation duet" — two sounds that find harmony after starting in discord.']},
+      {name:'Writing', sub:'Letters of Need', prompts:['Write an NVC statement for a real situation: observation, feeling, need, request. Let it be honest.','Write the letter you would send if you were speaking purely from your attachment longing — no criticism, no armor.','Describe the positive cycle: what would it look and feel like if the person you love responded to your deepest need?']},
+      {name:'Drama', sub:'The Reach and the Response', prompts:['Enact the negative cycle. Then pause. Enact the de-escalation. Then try again from a place of genuine vulnerability.','Perform the moment of genuine reaching — when the armor comes down and the need is named.','Role-play a conversation using only NVC language. What becomes possible?']},
+      {name:'Fashion', sub:'Adorning Connection', prompts:['Create something that represents the secure base — the feeling of being truly seen and responded to.','Design an adornment for the part of you that reaches for connection, even when it\'s been hurt before.','Make a wearable symbol for your most important unmet relational need.']},
+      {name:'Open Intuitive', sub:'Pure Contact', prompts:['Create something that represents what genuine connection feels like — no theory, just the felt sense.']}
+    ],
+    reflection:['What relational need feels most alive for you today?','Which pattern do you most recognize in yourself — pursuing or withdrawing?','What would you need to feel safe enough to be truly vulnerable?','One step toward a more positive cycle in your relationships…']
+  },
+
+  {
+    id:'somatic', num:'06', cluster:'nervous', color:'c-teal',
+    title:'Somatic Resourcing',
+    tagline:'The body as the site of healing',
+    tags:['Somatic Experiencing','Peter Levine','Body Wisdom','Titration'],
+    quote:{text:'The body keeps the score. The body does not lie. And the body, approached with curiosity and compassion, is the doorway to healing.',attr:'Adapted from Bessel van der Kolk'},
+    frame:`Somatic Experiencing, developed by Peter Levine, understands trauma not as a story in the mind but as incomplete physiological responses in the body. Animals complete their threat responses through shaking, trembling, and movement. Humans often interrupt this process, leaving survival energy frozen in the body.\n\nSomatic resourcing is about finding the body's natural capacity for regulation — the felt sense of groundedness, the places of ease, the movements that discharge activation. We work with small doses (titration), pendulating between activation and resource, always returning to what is okay.`,
+    modalities:['Somatic Experiencing','Peter Levine','Bessel van der Kolk','Felt Sense'],
+    stations:[
+      {name:'Visual Arts', sub:'The Body Map', prompts:['Draw an outline of your body. Map where you feel activation, where you feel ease, where you feel numb.','Create an image of your body\'s most reliable resource — the place that feels most okay, even when things are hard.','Paint the difference between a body that is bracing and a body that is settling.']},
+      {name:'Movement', sub:'Resourcing Through Motion', prompts:['Find the smallest movement that feels genuinely good right now. Stay with it. Let it be enough.','Explore shaking or trembling gently — let the body discharge activation in its own way.','Pendulate: move toward something slightly activating, then return to your resource. Repeat, slowly.']},
+      {name:'Music & Sound', sub:'The Sound of Settling', prompts:['Create sounds that feel regulating — humming, toning, slow rhythms. Let your body guide the choice.','Use music to follow your nervous system: what does it need to hear right now?','Make the sound of exhaling all the way. Then the sound of the pause before the next inhale. Stay there.']},
+      {name:'Writing', sub:'Letters from the Body', prompts:['Write a letter from your body to your mind. What does it need you to know? What has it been trying to tell you?','Describe your felt sense right now — not emotions, but physical sensations. Temperature, weight, movement, quality.','Write about a moment when your body felt genuinely safe. Use all five senses.']},
+      {name:'Drama', sub:'Embodied Story', prompts:['Create a movement sequence that tells the story of your nervous system: activation, overwhelm, resource, settling.','Perform the moment the body says "I can put it down now." What does that look like?','Embody your most reliable somatic resource — what does this resource do when you are struggling?']},
+      {name:'Fashion', sub:'Clothing the Body in Safety', prompts:['What would you wear if comfort and safety were the only considerations? Create or design it.','Make an adornment for your most reliable somatic resource — the place in your body that is okay.','Design something that represents the body\'s capacity to heal itself.']},
+      {name:'Open Intuitive', sub:'Body Knows', prompts:['Let your body — not your mind — choose how to use this time. Follow its lead without questioning.']}
+    ],
+    reflection:['Where in your body did you find the most ease today?','What surprised you about your body\'s responses?','What does your body most need from you right now?','One way you could resource your body this week…']
+  },
+
+  {
+    id:'ifs', num:'07', cluster:'self', color:'c-purple',
+    title:'IFS Parts Work',
+    tagline:'Getting to know your inner family',
+    tags:['Internal Family Systems','Schwartz','Exiles','Protectors'],
+    quote:{text:'The goal of IFS is not to eliminate parts, but to heal them — to unburden the exiles and unblend from the protectors so that Self can lead.',attr:'Richard Schwartz'},
+    frame:`Internal Family Systems (Richard Schwartz) understands the mind as a family of parts, each with its own perspective, history, and strategy for keeping the system safe. Exiles carry the wounded feelings from past experiences. Protectors — managers and firefighters — work hard to prevent those wounds from being activated.\n\nAt the center is the Self: calm, curious, compassionate, connected, creative, courageous, clear, and confident. The goal is not to silence any part but to help all parts relax and trust the leadership of Self. Today we meet our inner family with curiosity rather than judgment.`,
+    modalities:['IFS','Richard Schwartz','Parts Work','Self Energy'],
+    stations:[
+      {name:'Visual Arts', sub:'Portraits of the Inner Family', prompts:['Draw or paint one part of yourself — a protector, a manager, or a firefighter. Give it a form, a color, a posture.','Create a map or diagram of your inner system. Who lives there? How do they relate to each other?','Paint the Self — the calm, curious center. What does it look like when it is present?']},
+      {name:'Movement', sub:'Embodying Parts', prompts:['Embody a protector part — how does it hold the body? Move as this part would move.','Find the movement of Self — curious, calm, open. What does that feel like in the body?','Create a movement dialogue between two parts — let them negotiate through gesture and motion.']},
+      {name:'Music & Sound', sub:'Each Part Has a Voice', prompts:['Create a soundscape for one of your parts. What does the inner critic sound like? The frightened exile? The wise Self?','Improvise a conversation in sound between two parts — no words, just vocal expression.','What song does each of your major parts identify with? Create a playlist for your inner family.']},
+      {name:'Writing', sub:'Letters Between Parts', prompts:['Write a letter from a protector part to the exile it is protecting. What does it say?','Write a letter from Self to a part that has been working very hard. Thank it for what it has been doing.','Let an exile speak. Write what it has been holding — the feelings, the beliefs, the memories it carries.']},
+      {name:'Drama', sub:'Inner Family Theatre', prompts:['Create a scene from your inner family. Let two or three parts speak to each other. Give each a distinct voice and posture.','Perform the moment a protector relaxes — what happens when it trusts that Self is present?','Enact a part receiving unburdening — laying down what it has been carrying for so long.']},
+      {name:'Fashion', sub:'Dressing the Parts', prompts:['Design an outfit for one of your protector parts. How do they want to show up in the world?','Make a wearable symbol for Self — the eight C\'s: curious, calm, compassionate, connected, creative, courageous, clear, confident.','Create an adornment for the exile that has been carrying the heaviest burden.']},
+      {name:'Open Intuitive', sub:'Self-Led Creating', prompts:['Create from Self — not from any part\'s agenda. Notice who\'s driving as you work. Gently return to curiosity.']}
+    ],
+    reflection:['Which part showed up most today?','Could you notice Self at any point during the session?','What does a part of you most need right now?','One part you want to spend more time getting to know…']
+  },
+
+  {
+    id:'bridges', num:'08', cluster:'relation', color:'c-rose',
+    title:'Bridges & Boundaries',
+    tagline:'The paradox of connection and autonomy',
+    tags:['Attachment','Schopenhauer','Autonomy','Interpersonal'],
+    quote:{text:'A man can be himself only so long as he is alone; and if he does not love solitude, he will not love freedom; for it is only when he is alone that he is really free.',attr:'Arthur Schopenhauer'},
+    frame:`Schopenhauer's porcupine parable is one of the most profound descriptions of relational life: porcupines in winter huddle together for warmth, but their quills hurt each other. Too close and they wound; too far and they freeze. We spend our relational lives finding the optimal distance — close enough for warmth, far enough to avoid pain.\n\nHealthy relationships require both bridge-building (connection, vulnerability, reaching) and boundary-setting (autonomy, self-definition, healthy separation). Neither alone is sufficient. Today we explore both through creative expression.`,
+    modalities:['Attachment Theory','DBT Interpersonal Effectiveness','NVC','Systems Thinking'],
+    stations:[
+      {name:'Visual Arts', sub:'The Space Between', prompts:['Draw yourself and a significant relationship as two islands. What connects them? What separates them? What does the water between look like?','Create a visual map of your relational world: who is close, who is distant, where are the bridges, where are the walls?','Make a portrait of a boundary — not as a wall, but as a definition. What does your "I" look like?']},
+      {name:'Movement', sub:'Finding the Distance', prompts:['Explore the physical sensation of being too close, then too far, then just right. Let your body find its optimal distance.','Practice the movement of reaching and withdrawing — find where reaching becomes overextension.','Move with a partner or an imaginary other: negotiate the space between you without words.']},
+      {name:'Music & Sound', sub:'Harmony and Space', prompts:['Create two sounds that harmonize without merging — find the balance between connection and distinctness.','What does a porous boundary sound like versus a rigid one versus a healthy one?','Make the sound of genuinely choosing to be present with someone — the difference between obligation and desire.']},
+      {name:'Writing', sub:'Letters Across the Bridge', prompts:['Write a letter to someone you feel tangled with — not to untangle, but to find the truth of what you need.','Describe what you need in relationships using only needs language (no critiques, no demands). What do you truly long for?','Write about the relationship between solitude and connection in your life. How do you find your way back to yourself?']},
+      {name:'Drama', sub:'Negotiating Distance', prompts:['Create a scene where two people negotiate their needs for closeness and space. Let both needs be valid.','Perform the moment of setting a boundary from love rather than fear. What is different about the quality of it?','Enact the porcupine dilemma — the longing for warmth, the reality of the quills.']},
+      {name:'Fashion', sub:'Adornment as Boundary', prompts:['Design something that communicates "this is who I am" — adornment as self-definition rather than performance.','Create wearable art that represents the bridge between yourself and someone you love.','Make something that represents the right amount of armor — protective without being impenetrable.']},
+      {name:'Open Intuitive', sub:'Your Own Distance', prompts:['Create from exactly the amount of space you need right now. Close to others, in solitude, or somewhere between.']}
+    ],
+    reflection:['Where do you tend to lean — toward merging or toward distance?','What does a healthy boundary feel like in your body?','Where in your life do you need to build a bridge? Where do you need more space?','What does your optimal relational distance feel like?']
+  },
+
+  {
+    id:'shadow', num:'09', cluster:'dialectic', color:'c-gold',
+    title:'Shadow & Light',
+    tagline:"Integrating what we've hidden from ourselves",
+    tags:['Jungian Psychology','Shadow Work','Integration','Projection'],
+    quote:{text:'Until you make the unconscious conscious, it will direct your life and you will call it fate.',attr:'Carl Jung'},
+    frame:`In Jungian psychology, the Shadow is the collection of everything we have rejected, hidden, or disowned about ourselves — not only the "dark" qualities but also the bright ones that felt too dangerous to claim. We hide our rage, but we also hide our brilliance, our needs, our sensuality, our grief.\n\nThe Shadow does not disappear when we ignore it. It drives us from below, appearing as projection onto others, as inexplicable reactions, as the qualities we most despise (or most admire) in people around us. Shadow work is not about becoming dark — it is about becoming whole.`,
+    modalities:['Jungian Psychology','Narrative Therapy','IFS','Polarity Integration'],
+    stations:[
+      {name:'Visual Arts', sub:'Into the Dark', prompts:['Create an image of your shadow — the parts of you that you have hidden, denied, or projected. What does it look like in the dark?','Draw or paint the "golden shadow" — the brilliant, powerful parts of yourself that you haven\'t claimed.','Make a visual integration: bring the shadow and the light self into one image. What happens when they meet?']},
+      {name:'Movement', sub:'Embodying the Hidden', prompts:['Move as the part of you that you don\'t let others see. Let it be physical. Let it be real.','Find the movement of your rejected quality — the anger you swallow, the pride you hide, the grief you postpone.','Dance the integration: alternate between your presented self and your shadow self, then find a movement that contains both.']},
+      {name:'Music & Sound', sub:'The Sound You Suppress', prompts:['Make the sound you never let yourself make. The one that would be "too much."','Create a soundscape for the shadow: what does your disowned material sound like?','Find the note between your public voice and your private one. What lives there?']},
+      {name:'Writing', sub:'Letters from the Dark', prompts:['Write a letter from your shadow to your conscious self. What has it been waiting to say?','List 10 qualities you judge most harshly in others. Now write about where each quality might live — dormant, denied — in you.','Write about a part of yourself you have kept secret. Not to expose it, but to acknowledge it.']},
+      {name:'Drama', sub:'Shadow Theatre', prompts:['Perform a scene that gives voice to the part of you that never gets to speak in public.','Create a confrontation between your presented self and your shadow. What does each need from the other?','Enact the moment of integration — when the shadow is neither denied nor unleashed, but acknowledged.']},
+      {name:'Fashion', sub:'Dressing the Whole Self', prompts:['Design an outfit for your shadow self — the one you keep private. What do they wear?','Create an adornment for the golden shadow — the unclaimed brilliance, the hidden gifts.','Make something that represents the integration of shadow and light: complex, ambiguous, whole.']},
+      {name:'Open Intuitive', sub:'What Wants the Dark', prompts:['Let the shadow lead. Create without your inner censor. See what emerges when you stop managing the process.']}
+    ],
+    reflection:['What surprised you about what emerged today?','Where do you most clearly see your own shadow projected onto others?','What quality from your shadow are you ready to begin claiming?','What would it mean to be more wholly yourself?']
+  },
+
+  {
+    id:'window', num:'10', cluster:'nervous', color:'c-teal',
+    title:'Window of Tolerance',
+    tagline:'Mapping and expanding nervous system capacity',
+    tags:['Polyvagal','Dan Siegel','Hyperarousal','Hypoarousal'],
+    quote:{text:'Within the window of tolerance, we can process information, make meaning, and stay present. Outside it, we survive.',attr:'Dan Siegel'},
+    frame:`Dan Siegel's Window of Tolerance describes the zone of nervous system activation in which we can function most effectively. Within this window, we can think and feel simultaneously, process experiences, and stay in contact with the present moment. Above it, we are in hyperarousal — flooded, reactive, overwhelmed. Below it, we are in hypoarousal — numb, dissociated, collapsed.\n\nExpressive arts work is one of the most reliable ways to widen the window — gradually, safely, through titrated exposure to activation while remaining anchored in creative engagement. Today we map our window and explore what it feels like to work at its edges.`,
+    modalities:['Polyvagal Theory','Dan Siegel','Trauma-Informed Care','Somatic Experiencing'],
+    stations:[
+      {name:'Visual Arts', sub:'Mapping the Window', prompts:['Create a visual map of your window of tolerance. What does hyperarousal look like? Hypoarousal? The window itself?','Draw yourself in all three states — what does your body, face, and posture look like in each?','Make an image of your window expanding — what does more capacity look and feel like?']},
+      {name:'Movement', sub:'Edges of Capacity', prompts:['Explore movement in hyperarousal — fast, large, urgent. Then hypoarousal — slow, collapsed, small. Then find the window.','Practice a grounding movement sequence that helps you return to your window when you\'ve drifted.','Move at the edge of your window: slightly activated, but still present. Notice what that feels like.']},
+      {name:'Music & Sound', sub:'Regulation Through Sound', prompts:['Create sounds for each zone: the buzzing urgency of hyperarousal, the flatness of hypoarousal, the aliveness of the window.','Use music to regulate: what brings you down when you\'re flooded? What brings you up when you\'re numb?','Practice prosodic voice — the slow, melodic, rhythmic speech that activates the social engagement system.']},
+      {name:'Writing', sub:'State Letters', prompts:['Write three letters about the same experience — one from hyperarousal, one from hypoarousal, one from the window. Notice what changes.','Describe what your window of tolerance looks and feels like when it\'s wide open. Use all five senses.','Write about the early signs that you\'re leaving your window. What does your body do first?']},
+      {name:'Drama', sub:'Living in the Zones', prompts:['Perform a scene from each zone: hyperaroused character, hypoaroused character, and someone in their window.','Enact the process of returning to the window — what does that arc look like?','Create a dialogue between someone in hyperarousal and someone in the window. What does each need?']},
+      {name:'Fashion', sub:'Adorning the Window', prompts:['Design an adornment that represents your window of tolerance — something that reminds you where you are most alive and present.','Create something for your sensory toolkit — a texture, a weight, a scent that helps you return to your window.','Make a symbol for regulated capacity: what does "I am in my window" look like as a wearable?']},
+      {name:'Open Intuitive', sub:'Creating from the Window', prompts:['Create from within your window of tolerance. If you drift out, notice it, resource, and return. Let the process be the practice.']}
+    ],
+    reflection:['Where were you spending most of your time today — above, below, or within your window?','What is your most reliable way back to your window?','When is your window widest? What conditions support that?','One thing you can do this week to support your nervous system capacity…']
+  },
+
+  {
+    id:'tender-fierce', num:'11', cluster:'dialectic', color:'c-gold',
+    title:'Tender & Fierce',
+    tagline:'Honoring both softness and strength',
+    tags:['Dialectics','DBT','Compassion','Boundaries'],
+    quote:{text:'You do not have to be good. You do not have to walk on your knees for a hundred miles through the desert repenting. You only have to let the soft animal of your body love what it loves.',attr:'Mary Oliver'},
+    frame:`Tenderness and fierceness are not opposites — they are companions. The most profound forms of love contain both. A mother is fierce in protecting and tender in holding. A warrior rests in stillness between battles. A healthy boundary is tender toward yourself and fierce in its clarity.\n\nDBT's dialectical philosophy teaches that two seemingly opposing truths can be simultaneously valid. You can be hurt and healing. You can need gentleness and need fire. You can be soft-hearted and have a spine of steel. Today we explore the full spectrum of our capacity — neither pole alone is sufficient.`,
+    modalities:['DBT Dialectics','Compassion-Focused Therapy','ACT','Embodiment'],
+    stations:[
+      {name:'Visual Arts', sub:'Both/And', prompts:['Create an image that holds both tenderness and fierceness simultaneously. Let it be complex, ambiguous, true.','Draw your fierce self. Then draw your tender self. Then draw what they look like when they cooperate.','Make a visual representation of a truly loving boundary — fierce enough to hold, soft enough to invite.']},
+      {name:'Movement', sub:'The Full Range', prompts:['Find the movement of pure tenderness — soft, receptive, open. Then find the movement of pure fierceness. Then find the movement that contains both.','Let your body show you: where does your tender quality live? Where does your fierce quality live?','Practice the "fierce protector, tender nurturer" sequence — moving between both qualities and finding their integration.']},
+      {name:'Music & Sound', sub:'Tender-Fierce Soundscape', prompts:['Create a soundscape that begins in tenderness and moves into fierceness — or vice versa. Where do they meet?','What does your fierce voice sound like? Your tender voice? Can you make a sound that contains both?','Find the music that holds both — a lullaby with power, a battle hymn with grief.']},
+      {name:'Writing', sub:'Both/And Letters', prompts:['Write about a time you needed to be both tender and fierce simultaneously. What happened? What did it cost?','Write a manifesto for your tender self. Then for your fierce self. Read them together — what is true?','Finish this sentence in ten different ways: "I am both tender and fierce when…"']},
+      {name:'Drama', sub:'The Dialectic', prompts:['Create a scene that requires tenderness and fierceness in the same moment. Let neither be sacrificed.','Perform the moment someone realizes they can be soft and strong at the same time. What changes?','Enact a confrontation that is both compassionate and clear — neither collapsed nor aggressive.']},
+      {name:'Fashion', sub:'Adorning Both', prompts:['Design something that represents both your tenderness and your fierceness simultaneously.','What do you wear when you need to be fierce? What do you wear when you need to be tender? Make something for when you need both.','Create an adornment for your integrated self — complex, layered, complete.']},
+      {name:'Open Intuitive', sub:'Let Both Lead', prompts:['Create something without choosing between tender and fierce. Let the work hold the paradox for you.']}
+    ],
+    reflection:['Which quality do you more readily access — tender or fierce?','Where in your life does the balance between them feel most off?','What does integration feel like in the body when both are present?','One place where you want to practice bringing more of both…']
+  },
+
+  {
+    id:'roots-wings', num:'12', cluster:'dialectic', color:'c-gold',
+    title:'Roots & Wings',
+    tagline:'Groundedness and freedom in dynamic balance',
+    tags:['Attachment','Autonomy','Grounding','Freedom'],
+    quote:{text:'There are only two lasting bequests we can hope to give our children. One of these is roots; the other, wings.',attr:'Johann Wolfgang von Goethe'},
+    frame:`Roots represent our groundedness — our connection to belonging, to history, to the earth beneath us, to the places and relationships that know who we are. Wings represent our freedom — our capacity to grow beyond what we came from, to explore, to choose, to become.\n\nHealthy development requires both. Without roots, freedom becomes rootlessness — anxiety masquerading as liberty. Without wings, belonging becomes imprisonment — security that suffocates. Today we explore where we find our ground and how we find our flight.`,
+    modalities:['Attachment Theory','Autonomy Development','Existential Psychology','Somatic Grounding'],
+    stations:[
+      {name:'Visual Arts', sub:'Root Systems and Flight Paths', prompts:['Draw your root system — all the things, places, people, and stories that ground you. How deep do they go? How wide?','Create an image of your wings — the directions you are growing toward, the freedoms you are claiming.','Make one image that holds both: rooted and in flight simultaneously.']},
+      {name:'Movement', sub:'Grounded Flight', prompts:['Find a movement that is completely grounded — feet on the earth, weight dropping down. Stay with it.','Find a movement that is completely free — reaching upward, expanding, weightless. Let it carry you.','Find the movement that is both: rooted enough to fly, free enough to stay.']},
+      {name:'Music & Sound', sub:'Earth and Sky', prompts:['Create a soundscape from the roots — low, resonant, deep. Then one from the wings — high, open, soaring.','What music makes you feel most grounded? Most free? Can you find something that does both?','Hum from your chest for roots. Then from your head for wings. Find where they meet in the throat.']},
+      {name:'Writing', sub:'Stories of Ground and Flight', prompts:['Write about your roots: where you come from, what has held you, what has grown you. Let it be specific.','Write about your wings: where you are going, what you are becoming, what freedom means to you now.','Write about a time you lost your roots. Or a time you clipped your wings. What did that cost?']},
+      {name:'Drama', sub:'Taking Off and Landing', prompts:['Enact the moment of leaving home — leaving the familiar for the unknown. What does that feel like in the body?','Perform the return — coming back to your roots after time in flight. What have you brought back?','Create a scene between someone who is all roots (unable to leave) and someone who is all wings (unable to land).']},
+      {name:'Fashion', sub:'Wearing Ground and Sky', prompts:['Create an adornment that represents your roots — what keeps you connected to who you are.','Make something that represents your wings — the freedom you are claiming or growing toward.','Design something for the integration: what do you wear when you are simultaneously rooted and free?']},
+      {name:'Open Intuitive', sub:'Root or Fly', prompts:['Let your body decide: does it want to go deep into the ground today, or up into the sky? Follow where it leads.']}
+    ],
+    reflection:['Where do your roots feel most solid?','Where do your wings feel most free?','Which do you tend to need more of — rootedness or freedom?','What would it mean to be both deeply rooted and wildly free?']
+  },
+
+  {
+    id:'drive-stillness', num:'13', cluster:'dialectic', color:'c-gold',
+    title:'Drive & Stillness',
+    tagline:'Motivation, rest, and the wisdom of both',
+    tags:['Motivation','Rest','Burnout','Polyvagal'],
+    quote:{text:'Almost everything will work again if you unplug it for a few minutes, including you.',attr:'Anne Lamott'},
+    frame:`Drive and stillness are not opposites — they are phases of a single rhythm. The heart beats and rests. Breath fills and empties. Seasons turn from active growth to fallow rest. Humans are not designed for constant output; we are designed for rhythm.\n\nIn our culture, stillness is often misread as laziness, depression, or failure. Drive is romanticized even when it is dysregulation wearing productivity's clothing. Today we explore both — the genuine aliveness of motivated action and the profound wisdom of intentional rest — without privileging one over the other.`,
+    modalities:['Polyvagal Theory','Burnout Recovery','DBT Dialectics','Buddhist Rest'],
+    stations:[
+      {name:'Visual Arts', sub:'Motion and Stillness', prompts:['Create two images: one that captures the quality of genuine drive, one that captures the quality of genuine rest. Then notice what they have in common.','Draw the exhausted version of drive — when momentum becomes compulsion. Then draw the alive version of stillness — when rest is chosen.','Make a piece that shows your natural rhythm: when are you most driven? When do you most need stillness?']},
+      {name:'Movement', sub:'The Rhythm of You', prompts:['Begin in complete stillness. Let movement arise on its own, at its own pace. Notice what wants to move.','Find your genuine drive energy — the movement of motivated, intentional action. Not anxious busyness. True forward movement.','Alternate between stillness and motion. Let each inform the other.']},
+      {name:'Music & Sound', sub:'Tempo and Silence', prompts:['Create a soundscape that alternates between energy and silence. Let the silence be as full as the sound.','What is the tempo of your nervous system today? Create music to match it — then music to gently shift it.','Make a composition that includes both drive (rhythm, momentum) and stillness (pause, space). Let both have equal weight.']},
+      {name:'Writing', sub:'The Pages of Rest', prompts:['Write about the difference between rest and collapse, between drive and compulsion. Where do you typically live?','Describe what genuine, restorative rest would feel like for you. Be specific. Be honest about whether you allow it.','Write a letter to your driven self from your stillness self — or vice versa.']},
+      {name:'Drama', sub:'Action and Pause', prompts:['Perform a scene where a character learns to stop. Not because they\'re forced to, but because they choose to.','Enact the moment someone realizes their drive has become compulsion. What happens?','Create a scene between a person who cannot rest and a person who cannot mobilize. What do they each have to teach?']},
+      {name:'Fashion', sub:'Adorning Rhythm', prompts:['Design an outfit for your most driven self. Then for your most restful self. Notice what is the same.','Create a wearable symbol that represents the healthy alternation between drive and stillness.','Make something that reminds you that rest is not laziness — it is part of the rhythm.']},
+      {name:'Open Intuitive', sub:'Follow Your Rhythm', prompts:['Let yourself be exactly as driven or as still as you genuinely are right now. Create from that honest place.']}
+    ],
+    reflection:['Which do you have easier access to right now — drive or stillness?','Where in your life is the rhythm most off?','What does genuine rest — not collapse, not busyness — feel like for you?','One thing you could do to honor your natural rhythm this week…']
+  },
+
+  {
+    id:'metamorphosis', num:'14', cluster:'self', color:'c-purple',
+    title:'Metamorphosis & Becoming',
+    tagline:'Identity in transformation',
+    tags:['Identity','Transformation','Narrative Therapy','Post-Traumatic Growth'],
+    quote:{text:'We delight in the beauty of the butterfly, but rarely admit the changes it has gone through to achieve that beauty.',attr:'Maya Angelou'},
+    frame:`The caterpillar inside the chrysalis does not simply grow wings — it dissolves. Its entire body liquefies into a formless soup of cells, then reorganizes into something entirely new. Transformation is not gradual refinement. It often involves a period of dissolution, disorientation, and loss of the former self.\n\nNarrative therapy offers the concept of the "re-authoring" conversation: we are not our problems, and our lives contain many stories — including stories of resistance, resilience, and becoming that have not yet been fully told. Today we honor both the dissolution and the emergence.`,
+    modalities:['Narrative Therapy','Post-Traumatic Growth','IFS','Existential Psychology'],
+    stations:[
+      {name:'Visual Arts', sub:'The Chrysalis', prompts:['Create an image of what you are becoming — not what you were, not what you "should" be, but what you are in the process of becoming.','Draw or paint the chrysalis state — the dissolution before emergence. What does not-yet-becoming look like?','Make a before/during/after triptych of a transformation you are living through right now.']},
+      {name:'Movement', sub:'The Arc of Change', prompts:['Move as the caterpillar — the version of yourself before the current transformation.','Move as the chrysalis — formless, dissolving, held in uncertainty.','Move as what you are becoming — even if you don\'t know what that is yet. Let the body imagine forward.']},
+      {name:'Music & Sound', sub:'Songs of Becoming', prompts:['Create a soundscape for dissolution — the moment when the old form releases.','What does emergence sound like? Let your voice find the sound of something new arriving.','Make a sonic arc: beginning, dissolution, transformation, emergence. Let it take as long as it needs.']},
+      {name:'Writing', sub:'The Re-authoring', prompts:['Write the story of who you were before. Then write the story of who you are becoming. What has been lost? What has been gained?','Write from inside the chrysalis — from the middle of transformation, when you don\'t know who you\'ll be.','Describe one story about yourself that no longer fits. Then begin the new story.']},
+      {name:'Drama', sub:'The Emerging Self', prompts:['Enact the moment of emergence — what does it look and feel like when a new version of yourself arrives?','Create a scene where someone is in the middle of transformation — neither who they were nor who they will be. What do they need?','Perform a confrontation between the old self and the emerging self.']},
+      {name:'Fashion', sub:'Adorning the Becoming', prompts:['Create something for the self you are becoming — not who you were, not who you feel you "should" be, but who you are genuinely turning into.','Make a symbol for the chrysalis: held, dark, uncertain, and full of possibility.','Design an adornment that honors both who you were and who you are becoming.']},
+      {name:'Open Intuitive', sub:'Becoming Freely', prompts:['Create without knowing what it will be. Let the work itself be a form of becoming.']}
+    ],
+    reflection:['What are you in the process of becoming?','What has needed to dissolve to make room for this transformation?','What is the hardest part of being in transition?','One thing the emerging version of you wants to say…']
+  },
+
+  {
+    id:'wild-tame', num:'15', cluster:'self', color:'c-purple',
+    title:'Wild & Tame',
+    tagline:'Authenticity versus masking',
+    tags:['Authenticity','Masking','Neurodivergence','Jungian'],
+    quote:{text:'It takes courage to grow up and become who you really are.',attr:'e.e. cummings'},
+    frame:`We are all tamed to some degree. From early childhood, we learn which parts of ourselves are acceptable and which must be hidden, quieted, or modified. For neurodivergent individuals, this process of masking is often extreme and exhausting. For many in recovery, the wild self was driven underground by shame, trauma, or the demands of survival.\n\nThe "wild" self is not reckless or dangerous — it is authentic. It is the part that knows what it wants, that moves toward genuine pleasure, that protests injustice, that loves what it loves without apology. Today we give it room to breathe.`,
+    modalities:['Narrative Therapy','Neurodivergent-Affirming Practice','IFS','Jungian Psychology'],
+    stations:[
+      {name:'Visual Arts', sub:'Mask and Face', prompts:['Draw or paint the mask you wear most often. Then draw or paint what is underneath it.','Create a portrait of your wild self — the one that has been most tamed or hidden.','Make a collage of everything your authentic self loves, wants, and needs — uncensored.']},
+      {name:'Movement', sub:'The Untamed Body', prompts:['Move as your most tamed, constrained, "appropriate" self. Notice how that feels.','Now move as your wild self — unconstrained, authentic, fully expressed. Let it be as different as it wants.','Find the movement of someone who has just removed the mask. What does that release look like?']},
+      {name:'Music & Sound', sub:'The Sound of Freedom', prompts:['What sound does your wild self make that your tame self suppresses? Make it.','Create the sound of taking off the mask — what releases?','What does your authentic voice sound like, separate from your social voice?']},
+      {name:'Writing', sub:'The Liberation Texts', prompts:['Write a letter from your wild self to your tame self: what has it been waiting to say?','Tell the story of when you first learned to tame yourself. Be specific. Be compassionate. Be honest.','Write a list of everything you are done apologizing for.']},
+      {name:'Drama', sub:'Unmasking', prompts:['Perform the moment of removing the mask. What does it feel like? What does it look like?','Create a scene where someone chooses authenticity over approval. What does it cost? What does it gain?','Enact a dialogue between your wild self and your tame self. Let both speak fully.']},
+      {name:'Fashion', sub:'Wearing Your True Self', prompts:['Design the outfit your wild self would wear if there were no social consequences.','Create or design something that expresses your authentic self rather than your social self.','Make a wearable symbol for the courage it takes to be genuinely yourself.']},
+      {name:'Open Intuitive', sub:'Let Wild Lead', prompts:['Create without your inner editor, your social monitor, or your performance anxiety. Let the wild self make something.']}
+    ],
+    reflection:['What part of your wild self has been most tamed?','What does it cost you to mask consistently?','What one thing could you authentically express more of this week?','What does it feel like in your body when you are genuinely yourself?']
+  },
+
+  {
+    id:'hope', num:'16', cluster:'meaning', color:'c-sage',
+    title:'Hope',
+    tagline:'Radical hope and post-traumatic growth',
+    tags:['Post-Traumatic Growth','Radical Hope','Resilience','Frankl'],
+    quote:{text:'Everything can be taken from a man but one thing: the last of the human freedoms — to choose one\'s attitude in any given set of circumstances.',attr:'Viktor Frankl'},
+    frame:`Radical hope, as philosopher Jonathan Lear describes it, is hope directed at a future whose content we cannot fully imagine. It is not optimism (which requires a clear picture of a better future) but the commitment to the possibility that something good can emerge — even from devastation.\n\nPost-traumatic growth research (Tedeschi & Calhoun) shows that the majority of people who survive significant trauma report areas of positive change: greater appreciation for life, deeper relationships, increased personal strength, spiritual development, and new possibilities. Today we explore hope not as denial of pain, but as its companion.`,
+    modalities:['Post-Traumatic Growth','Viktor Frankl','Radical Hope','Existential Psychology'],
+    stations:[
+      {name:'Visual Arts', sub:'Images of Hope', prompts:['Create an image of hope as you actually experience it — not the greeting card version, but the real, hard-won, sometimes barely-visible kind.','Make a visual representation of post-traumatic growth: not before and after, but the complicated, nonlinear, real thing.','Draw the small green shoot pushing through concrete. What is the concrete in your life? What is the shoot?']},
+      {name:'Movement', sub:'Embodied Hope', prompts:['Find the movement of hope. Not performance — the actual, felt sense of hope in the body. It may be very small.','Move between despair and hope, not as opposites, but as neighbors. Let the body find both and find what connects them.','Find the movement of radical hope — commitment to a future you cannot fully see.']},
+      {name:'Music & Sound', sub:'Songs of Surviving', prompts:['What music carries you when hope is hard? Play it. Let it do what it does.','Create sounds that hold both grief and hope simultaneously — not one after the other, but together.','Make the sound of something beginning. Very quietly. Just beginning.']},
+      {name:'Writing', sub:'Letters Forward', prompts:['Write a letter to yourself five years in the future. What do you want that person to know? What do you hope for them?','Describe the areas of growth that have emerged from your hardest experiences. Be honest about the cost and the gain.','Write about a time you chose hope when despair would have been easier. What made that possible?']},
+      {name:'Drama', sub:'The Long Game', prompts:['Enact the moment hope returns after a long absence. Make it subtle — hope rarely arrives with fanfare.','Create a scene between two people: one who has lost hope, one who still carries it. What does the one with hope offer — and how?','Perform the commitment to the future you cannot fully see: what does radical hope look like in the body?']},
+      {name:'Fashion', sub:'Adorning the Future Self', prompts:['Create something for the person you are hoping to become. A gift to the future self.','Design an adornment that represents your specific, hard-won form of hope.','Make a talisman for the times when hope is hardest. Something to hold when the green shoot is barely visible.']},
+      {name:'Open Intuitive', sub:'Creating Toward', prompts:['Create something you are making for the future — for someone you will be, for a world you are hoping toward.']}
+    ],
+    reflection:['Where does hope live in your body today?','What is one area of post-traumatic growth you are willing to acknowledge?','What do you hope for — for yourself, for the people you love, for the world?','One small thing you can do today that aligns with your deepest hopes…']
+  },
+
+  {
+    id:'reclaiming-zest', num:'17', cluster:'self', color:'c-purple',
+    title:'Reclaiming Zest',
+    tagline:"What stole your spark — and how to get it back",
+    tags:['Recovery','Vitality','Shadow Work','Reclamation'],
+    quote:{text:'The most common form of despair is not being who you are.',attr:'Søren Kierkegaard'},
+    frame:`This is Zest 2.0 — but where the original Zest group explored what aliveness looks and feels like, Reclaiming Zest asks the harder question: what happened to it? For many people, the vitality and creative aliveness they were born with was gradually (or suddenly) taken — by trauma, by illness, by shame, by the demands of fitting in, by the long work of survival.\n\nReclamation is not about returning to who you were before — that person had your spark but not your depth. Reclamation is about integrating what you have lived with what you were born knowing, and discovering the specific, hard-won aliveness that is available to you now.`,
+    modalities:['Narrative Therapy','Shadow Work','Post-Traumatic Growth','IFS'],
+    stations:[
+      {name:'Visual Arts', sub:'The Theft and the Return', prompts:['Create an image of your spark before it was diminished. What did it look like then?','Make a visual map of what happened — the people, events, beliefs, or circumstances that dimmed your aliveness.','Create a piece that represents the reclamation: the spark returning, in its current, more complex form.']},
+      {name:'Movement', sub:'Remembering Aliveness', prompts:['Move as you did as a child, before you learned to be careful. Let the body remember what it knew then.','Move through the story of your aliveness being diminished — and then move through what is being recovered.','Find the movement of your current, specific form of vitality — different from what it was, but genuinely yours.']},
+      {name:'Music & Sound', sub:'The Sound of Your Spark', prompts:['What music reminds you of your aliveness before it was dimmed? Play it. Stay with it.','Create the sound of something stolen being returned. What does that feel like in the voice?','Improvise the sound of your current, reclaimed form of vitality.']},
+      {name:'Writing', sub:'The Reclamation Story', prompts:['Write the story of when your spark began to dim. Be specific. Be compassionate. It was not your fault.','Write about who or what helped you remember your aliveness — even briefly — during the dimming years.','Write the beginning of the reclamation story: "I am taking back…"']},
+      {name:'Drama', sub:'The Return', prompts:['Perform the moment of reclamation — when the spark, however dimly, returns.','Create a scene between the version of you who lost your zest and the version who is reclaiming it. What does the current one offer the past one?','Enact the act of taking something back: a quality, a joy, a right to be fully alive.']},
+      {name:'Fashion', sub:'Adorning the Reclaimed Self', prompts:['Design something for the version of you that has survived and is reclaiming vitality — complex, earned, alive.','Create an adornment that represents specifically what you are taking back.','Make a talisman for the ongoing work of reclamation — something to hold on the hard days.']},
+      {name:'Open Intuitive', sub:'Creating as Reclamation', prompts:['Let this making itself be an act of reclaiming your creative aliveness. Create because you are allowed to.']}
+    ],
+    reflection:['What specifically was stolen from your aliveness, and by what?','What spark has survived despite everything?','What is one thing you are actively reclaiming?','What does your current, specific, hard-won form of aliveness look and feel like?']
+  },
+
+  {
+    id:'lucky13', num:'18', cluster:'meaning', color:'c-sage',
+    title:'Lucky 13',
+    tagline:"Flipping the script on what we've been told to fear",
+    tags:['Narrative Therapy','Stigma','Reclamation','Sacred History'],
+    quote:{text:'Everything you\'ve been told to fear has, at some point, been revered.',attr:'Brian Nuckols, CFD'},
+    frame:`The number 13 was sacred before it was feared — woven into lunar cycles, the divine feminine, seasonal rhythms. Friday was Freya's day, the Norse goddess of love, fertility, and magic. Black cats were revered in ancient Egypt as protectors. Everything that has been called "unlucky" was once powerful, and got demonized for it.\n\nThis is exactly the story many of us know in our own bodies and identities: the parts of us that were labeled too much, broken, cursed, or wrong were often exactly the parts that held the most power, sensitivity, or truth. Today we flip the script — reclaiming what was called cursed and discovering what was always sacred within it.`,
+    modalities:['Narrative Therapy','IFS','Jungian Psychology','Post-Traumatic Growth'],
+    stations:[
+      {name:'Visual Arts', sub:'The Sacred Within the Cursed', prompts:['Create an illuminated manuscript page for something about yourself that was once labeled as wrong, broken, or too much — illustrated as sacred.','Make a "curse to blessing" portrait: show a quality you were told was bad, transformed into its actual gift.','Create a visual talisman for a part of yourself that has been demonized. Give it the reverence it deserves.']},
+      {name:'Movement', sub:'The Walk of Reclamation', prompts:['Move as someone who knows that what was called cursed about them is actually their power. Own the room.','Find the gesture of reclaiming something that was taken — the physical act of taking it back.','Dance the transformation: from shame to sovereignty, from cursed to sacred.']},
+      {name:'Music & Sound', sub:'The Counter-Spell', prompts:['Create the sound of breaking a curse — the sound of a story losing its power over you.','Whisper something that was called wrong about you. Then say it at full volume, without apology.','Make the sound of 13 — the sacred, lunar, powerful number. Beat it, hum it, celebrate it.']},
+      {name:'Writing', sub:'The Re-Enchantment', prompts:['Write a counter-narrative: take something that was framed as your defect or curse and reframe it as your gift or power. Be specific.','Write the letter you would write to the part of you that has been carrying the shame of being "too much" or "not enough."','Finish this: "What I was told was wrong about me is actually…"']},
+      {name:'Drama', sub:'The Coronation', prompts:['Enact the trial of the accused and the verdict of innocence: perform the moment a "cursed" quality is recognized as sacred.','Create a coronation scene: you, crowning the part of yourself that was once shamed, as royalty.','Perform the counter-spell — the words, gestures, or declaration that breaks the old story\'s power.']},
+      {name:'Fashion', sub:'Crown of the Reclaimed', prompts:['Create a crown or adornment for the part of you that was once shamed — now crowned as powerful.','Design the costume of someone who knows their "cursed" qualities are actually their superpower.','Make a talisman that represents a quality once called unlucky that is actually your specific gift.']},
+      {name:'Open Intuitive', sub:'The Thirteenth Thing', prompts:['Create your 13th thing — the one you\'ve held back, the one that was told it didn\'t belong. Let it finally make something.']}
+    ],
+    reflection:['What quality of yours was called "cursed" or too much or wrong?','What was the sacred history of that quality, before it was demonized?','What would it mean to fully reclaim it?','One thing you are ready to stop apologizing for…']
+  },
+
+  {
+    id:'voice-silence', num:'19', cluster:'meaning', color:'c-silver',
+    title:'Voice & Silence',
+    tagline:'What we say, what we swallow, what lives between',
+    tags:['NVC','Polyvagal','IFS','Buddhist Psychology'],
+    quote:{text:'Your silence will not protect you. But for every real word spoken — I had made contact with other women while we examined the words to fit a world in which we all believed.',attr:'Audre Lorde'},
+    frame:`Voice is not only what we say aloud — it is how we claim our existence in relationship, to others and to ourselves. Silence is not only absence. It can be refuge, protest, protection, or the deepest form of knowing. Buddhist psychology distinguishes noble silence (purposeful, spacious) from the silence of suppression or avoidance.\n\nIn recovery and healing, we encounter both: the words we've been waiting to speak, and the silences that have kept us safe — or kept us small. The throat, somatically and symbolically, is where voice meets decision. Many of us hold chronic tension there, a permanent swallowing of the things we could not safely say. Today we create space for both.`,
+    modalities:['NVC','Polyvagal Theory','IFS Parts Work','Buddhist Psychology','Narrative Therapy'],
+    stations:[
+      {name:'Visual Arts', sub:'The Unsaid, Made Visible', prompts:['Draw or paint your voice — not what it says, but what it looks like. Shape, color, texture, weight.','Create "The Unsaid Letter" — a visual piece representing something you have never put into words. No words needed.','Draw the throat as a landscape. What lives there? What is growing? What is held?']},
+      {name:'Movement', sub:'What the Body Says', prompts:['Move like a sound wave — let your whole body trace the shape of sound through air. Big waves, tiny ripples, stillness between.','Explore swallowing as a physical act. What does your body do when you swallow a word? Where does it go?','Alternate between taking up space and collapsing. Notice when each feels like speaking, and when each feels like silence.']},
+      {name:'Music & Sound', sub:'Breath Is the First Instrument', prompts:['Hum something — not a song, just a sound that wants to come out. Wordless. Let it change.','Whisper something true. Then say it aloud. Then say it again louder. Notice what shifts at each volume.','Sit in intentional silence for three minutes. What sounds do you notice? What arises in the absence of speech?']},
+      {name:'Writing', sub:'The Letter Never Sent', prompts:['Write the letter you have never sent. You do not have to send it today. Just begin.','Write a list: "Things I say." Then: "Things I have never said." Let the second list be as long as it wants.','Finish this sentence in ten ways: "What I have always wanted to say is…"']},
+      {name:'Drama', sub:'The Moment Before Speaking', prompts:['Enact the moment before speaking — the pause where the decision is made. Make it long, visible, physical.','Give voice to the part of you that has been silent the longest. What does it want to say, now that it has the stage?','Practice saying something difficult to the room, an empty chair, or a mirror. Notice the difference between the rehearsal and the saying.']},
+      {name:'Fashion', sub:'Adorning the Place of Voice', prompts:['Create an adornment for the throat — a collar, necklace, or scarf. What do you want to protect there? What to celebrate?','Design something that represents your voice at its most free. What would you wear speaking your fullest truth?','Make a talisman of speaking — a small object representing the courage it takes to be heard.']},
+      {name:'Open Intuitive', sub:'Follow What Arises', prompts:['This station has no prompts. Sit in silence. Use materials without direction. Let what wants to happen, happen.']}
+    ],
+    reflection:['What came as a surprise in the silence or the speaking today?','A silence you noticed in yourself — what kind was it?','Something that wants to be voiced — not necessarily aloud, just acknowledged…','One thing you are taking with you from today…']
+  }
+];
+
+// ═══════════════════════════════════════════════════════════
+// RENDER LIBRARY
+// ═══════════════════════════════════════════════════════════
+function renderLibrary() {
+  const lib = document.getElementById('library');
+  lib.innerHTML = GROUPS.map((g, i) => `
+    <div class="group-card ${g.color}" data-cluster="${g.cluster}" onclick="openGroup('${g.id}')"
+         style="animation-delay:${i*0.04}s">
+      <div class="card-num">Session ${g.num}</div>
+      <div class="card-title">${g.title}</div>
+      <div class="card-tagline">${g.tagline}</div>
+      <div class="card-tags">${g.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+    </div>
+  `).join('');
+}
+
+// ═══════════════════════════════════════════════════════════
+// FILTER
+// ═══════════════════════════════════════════════════════════
+function filter(cluster, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.querySelectorAll('.group-card').forEach(card => {
+    if(cluster==='all' || card.dataset.cluster===cluster) {
+      card.classList.remove('hidden');
+    } else {
+      card.classList.add('hidden');
+    }
+  });
+}
+
+// ═══════════════════════════════════════════════════════════
+// OPEN GROUP DETAIL
+// ═══════════════════════════════════════════════════════════
+function openGroup(id) {
+  const g = GROUPS.find(x=>x.id===id);
+  if(!g) return;
+
+  document.getElementById('library').style.display='none';
+  document.getElementById('filterBar').style.display='none';
+  document.getElementById('masthead').style.display='none';
+
+  const det = document.getElementById('detail');
+  det.innerHTML = `
+    <button class="back-btn" onclick="closeDetail()">← Back to Library</button>
+
+    <div class="detail-header">
+      <p class="eyebrow">Session ${g.num} · ${clusterLabel(g.cluster)}</p>
+      <h2>${formatTitle(g.title)}</h2>
+      <p class="sub">${g.tagline}</p>
+    </div>
+
+    <div class="quote-block">
+      <blockquote>"${g.quote.text}"</blockquote>
+      <cite>— ${g.quote.attr}</cite>
+    </div>
+
+    <div class="frame-card">
+      <h3>Therapeutic Frame</h3>
+      ${g.frame.split('\n\n').map(p=>`<p>${p}</p>`).join('')}
+      <div class="modality-chips">
+        ${g.modalities.map(m=>`<span class="chip">${m}</span>`).join('')}
+      </div>
+    </div>
+
+    <div class="stations-label">Seven Stations — tap to expand</div>
+    <div class="station-grid">
+      ${g.stations.map((s,i)=>`
+        <div class="stn" onclick="toggleStn(this)">
+          <div class="stn-top">
+            <div>
+              <div class="stn-name">Station ${toRoman(i+1)} · ${s.name}</div>
+              <div class="stn-sub">${s.sub}</div>
+            </div>
+            <span class="stn-arrow">▾</span>
+          </div>
+          <div class="stn-prompts">
+            <ol>${s.prompts.map(p=>`<li>${p}</li>`).join('')}</ol>
+            <div class="pass-note">✦ Always optional — observe, participate, or simply be present here.</div>
+          </div>
+        </div>
+      `).join('')}
+    </div>
+
+    <div class="reflect-section">
+      <div class="stations-label">Integration & Reflection</div>
+      <div class="reflect-grid">
+        ${g.reflection.map((r,i)=>`
+          <div class="rf ${i===g.reflection.length-1 && g.reflection.length%2!==0?'rf-full':''}">
+            <label>${r}</label>
+            <textarea id="ref_${g.id}_${i}" placeholder="Your thoughts…" oninput="autoSave('${g.id}')"></textarea>
+          </div>
+        `).join('')}
+      </div>
+      <button class="btn" onclick="saveRef('${g.id}')">Save Reflections</button>
+      <button class="btn btn-ghost" onclick="clearRef('${g.id}',${g.reflection.length})">Clear</button>
+      <div id="sv-note" style="display:none;font-family:'Cinzel',serif;font-size:0.6rem;letter-spacing:0.1em;color:var(--teal);margin-top:0.5rem;">✦ Saved</div>
+    </div>
+
+    <div class="crisis">
+      <span>Support Resources</span>
+      <a href="tel:988">988 Crisis Lifeline</a>
+      <a href="tel:741741">Text HOME to 741741</a>
+      <a href="tel:18006624357">SAMHSA 1-800-662-4357</a>
+    </div>
+  `;
+  det.classList.add('open');
+  window.scrollTo({top:0,behavior:'smooth'});
+
+  // Load saved reflections
+  try {
+    const saved = JSON.parse(localStorage.getItem('compendium_' + g.id) || '{}');
+    g.reflection.forEach((_,i) => {
+      const el = document.getElementById(`ref_${g.id}_${i}`);
+      if(el && saved[i]) el.value = saved[i];
+    });
+  } catch(e){}
+}
+
+function closeDetail() {
+  document.getElementById('detail').classList.remove('open');
+  document.getElementById('detail').innerHTML='';
+  document.getElementById('library').style.display='';
+  document.getElementById('filterBar').style.display='';
+  document.getElementById('masthead').style.display='';
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function toggleStn(el) {
+  const was = el.classList.contains('open');
+  document.querySelectorAll('.stn').forEach(s=>s.classList.remove('open'));
+  if(!was) el.classList.add('open');
+}
+
+// Reflection save/clear
+function saveRef(id) {
+  const g = GROUPS.find(x=>x.id===id);
+  const data = {};
+  g.reflection.forEach((_,i) => {
+    const el = document.getElementById(`ref_${id}_${i}`);
+    if(el) data[i] = el.value;
+  });
+  try {
+    localStorage.setItem('compendium_'+id, JSON.stringify(data));
+    const note = document.getElementById('sv-note');
+    if(note){note.style.display='inline';setTimeout(()=>note.style.display='none',2500);}
+  } catch(e){}
+}
+
+let autoSaveTimer;
+function autoSave(id){ clearTimeout(autoSaveTimer); autoSaveTimer=setTimeout(()=>saveRef(id),1500); }
+
+function clearRef(id, count) {
+  if(!confirm('Clear reflections for this session?')) return;
+  for(let i=0;i<count;i++){
+    const el=document.getElementById(`ref_${id}_${i}`);
+    if(el) el.value='';
+  }
+  localStorage.removeItem('compendium_'+id);
+}
+
+// Helpers
+function toRoman(n){return['I','II','III','IV','V','VI','VII'][n-1]||n;}
+function clusterLabel(c){
+  return{nervous:'Nervous System',self:'Self & Identity',relation:'Relationships',
+         dialectic:'Dialectics',emotion:'Emotion',meaning:'Meaning & Growth'}[c]||c;
+}
+function formatTitle(t){
+  // Italicize the second word for certain titles
+  const parts = t.split(' & ');
+  if(parts.length===2) return `${parts[0]} &amp; <em>${parts[1]}</em>`;
+  return t;
+}
+
+// Init
+renderLibrary();
+</script>
+</body>
+</html>
